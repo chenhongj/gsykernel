@@ -1,32 +1,56 @@
 CC=gcc
 ASM=nasm
+LD=ld
 
+VPATH=src/boot/:src/kernel/
 MBR=bin/mbr.bin
-HEAD=bin/head.bin
-
 DISK=tools/10M.img
-ASMFLAGS=-f bin
+KERNEL_ELF=bin/kernel.elf
+KERNEL_BIN=bin/kernel.bin
 
-all:mbr head
+OBJDIR=obj/
+INCDIR=include
+
+MYASMFLAGS=-f elf
+MYCFLAGS=-Wall -Werror -O0 -m32 -finline-functions -nostdinc -fno-builtin -I$(INCDIR)
+#MYLDFLAGS=-T link.ld --oformat=binary -m elf_i386 -s
+MYLDFLAGS=-T link.ld -m elf_i386
+
+OBJ=head.o kernel.o
+OBJS= $(addprefix $(OBJDIR), $(OBJ))
+DEPS= $(wildcard include/*.h) Makefile
+
+
+
+all:mbr $(KERNEL_BIN) tools
 
 disk:
 	dd if=/dev/zero of=$(DISK) bs=512 count=20160
-
 mbr:
-	$(ASM) $(ASMFLAGS) src/boot/mbr.s -o $(MBR)
-mbrcp:
-	$(CC) tools/mbrcp.c -o tools/mbrcp
+	$(ASM)	-f bin src/boot/mbr.s -o $(MBR)
 
-head:
-	$(ASM) $(ASMFLAGS) src/boot/head.s -o $(HEAD)
-headcp:
-	$(CC) tools/headcp.c -o tools/headcp
+$(KERNEL_ELF):$(OBJS)
+	$(LD)	$(MYLDFLAGS) $^ -o $@
 
-install:mbr mbrcp head headcp
+$(KERNEL_BIN):$(KERNEL_ELF)
+	objcopy -R .comment -R .eh_frame -I elf32-i386 -O binary $(KERNEL_ELF) $(KERNEL_BIN)
+
+$(OBJDIR)%.o: %.c $(DEPS)
+	$(CC)	$(MYCFLAGS) -c $< -o $@
+
+$(OBJDIR)%.o: %.s $(DEPS)
+	$(ASM)	$(MYASMFLAGS) $< -o $@
+
+tools:tools/mbrcp tools/kernelcp
+	$(CC)	tools/mbrcp.c -o tools/mbrcp
+	$(CC)	tools/kernelcp.c -o tools/kernelcp
+
+install:all
 	tools/mbrcp $(MBR) $(DISK)
-	tools/headcp $(HEAD) $(DISK)
+	tools/kernelcp $(KERNEL_BIN) $(DISK)
 
 run:install
-	bochs -qf tools/my.boshrc
+	/home/gsy/myroot/bin/bochs -qf tools/my.boshrc
+
 clean:
-	rm -rf $(MBR) tools/mbrcp bx_enh_dbg.ini
+	rm	-rf $(MBR) tools/mbrcp bx_enh_dbg.ini $(OBJS) $(KERNEL_ELF) $(KERNEL_BIN)

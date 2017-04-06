@@ -9,7 +9,7 @@ int main(int argc, char **argv)
         puts("mbrcp src dst");
         return 1;
     }
-    
+
     FILE *src = NULL;
     FILE *dst = NULL;
     

@@ -50,7 +50,6 @@ ok:
     
     mov ax, 0x0001
     lmsw ax             ;置位保护模式，已经进入保护模式，下面使用段选择符来跳转到
-    
     jmp dword 0x00000008:0x00010000
 
 bios_error:
