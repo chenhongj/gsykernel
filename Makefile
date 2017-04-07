@@ -2,7 +2,7 @@ CC=gcc
 ASM=nasm
 LD=ld
 
-VPATH=src/boot/:src/kernel/
+VPATH=src/boot/:src/kernel/:src/arch
 MBR=bin/mbr.bin
 DISK=tools/10M.img
 KERNEL_ELF=bin/kernel.elf
@@ -13,13 +13,11 @@ INCDIR=include
 
 MYASMFLAGS=-f elf
 MYCFLAGS=-Wall -Werror -O0 -m32 -finline-functions -nostdinc -fno-builtin -I$(INCDIR)
-#MYLDFLAGS=-T link.ld --oformat=binary -m elf_i386 -s
 MYLDFLAGS=-T link.ld -m elf_i386
 
-OBJ=head.o kernel.o
+OBJ=head.o kernel.o arch.o gdt.o idt.o
 OBJS= $(addprefix $(OBJDIR), $(OBJ))
 DEPS= $(wildcard include/*.h) Makefile
-
 
 
 all:mbr $(KERNEL_BIN) tools
