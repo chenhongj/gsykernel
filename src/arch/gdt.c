@@ -1,4 +1,3 @@
-#include <arch.h>
 #include <gdt.h>
 
 //使用3个段

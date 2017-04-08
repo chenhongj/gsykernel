@@ -4,6 +4,7 @@
 #include <type.h>
 #include <gdt.h>
 #include <idt.h>
+#include <irq.h>
 
 #define _BIOS_MMAP_SIZE 20
 struct BIOS_MMAP
@@ -14,6 +15,5 @@ struct BIOS_MMAP
 };
 
 void arch_init();
-
 
 #endif

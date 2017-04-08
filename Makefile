@@ -15,7 +15,7 @@ MYASMFLAGS=-f elf
 MYCFLAGS=-Wall -Werror -O0 -m32 -finline-functions -nostdinc -fno-builtin -I$(INCDIR)
 MYLDFLAGS=-T link.ld -m elf_i386
 
-OBJ=head.o kernel.o arch.o gdt.o idt.o
+OBJ=head.o kernel.o asm.o arch.o gdt.o idt.o irq.o
 OBJS= $(addprefix $(OBJDIR), $(OBJ))
 DEPS= $(wildcard include/*.h) Makefile
 

@@ -4,8 +4,11 @@
 #include <type.h>
 
 #define TASK_GATE       (BIT0 | BIT2)
-#define INTERRUPT_GATE  (BIT0 | BIT1 | BIT2 | BIT3)
-#define TRAP_GATE       (BIT1 | BIT2 | BIT3 )
+#define INTERRUPT_GATE  (BIT1 | BIT2 | BIT3)
+#define TRAP_GATE       (BIT0 | BIT1 | BIT2 | BIT3 )
+#define CALL_GATE       (BIT2 | BIT3)
+#define TSS_BUSY        (BIT0 | BIT1 | BIT3)
+#define TSS_A           (BIT0 | BIT3)
 
 //IDT描述符
 struct idt_entry

@@ -18,14 +18,14 @@ void idt_set_gate(uint8 num, uint32 base, uint16 sel, uint8 flags)
 }
 
 //初始化IDT
- void idt_init()
- {
-     //IDT位置和大小
-     idtp.limit = (sizeof (struct idt_entry) * 256) - 1;
-     idtp.base = (uint32)((void *)(&idt));
-     //清空
-     //memset((uint8 *)&idt, 0, sizeof(struct idt_entry) * 256);
+void idt_init()
+{
+    //IDT位置和大小
+    idtp.limit = (sizeof (struct idt_entry) * 256) - 1;
+    idtp.base = (uint32)((void *)(&idt));
+    //清空
+    //memset((uint8 *)&idt, 0, sizeof(struct idt_entry) * 256);
 
-     //装载IDT
-     idt_load();
- }
+    //装载IDT
+    idt_load();
+}
