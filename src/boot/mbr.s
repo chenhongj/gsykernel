@@ -43,7 +43,7 @@ load_head:
     mov es, ax
     xor bx, bx      ;内核读入到es：bx
     mov ah, 0x02    ;13号中断的02功能
-    mov al, 10      ;读入的扇区数量
+    mov al, 100      ;读入的扇区数量
     int 0x13
     jc bios_error   ;读取失败就死机
     

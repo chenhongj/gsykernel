@@ -1,6 +1,8 @@
 #include <irq.h>
 #include <idt.h>
 #include <asm.h>
+#include <video.h>
+#include <stdio.h>
 
 //设置中断字符串
 char * exception_messages[] =
@@ -93,18 +95,18 @@ extern void irq46();
 extern void irq47();
 
 //16个系统中断函数入口
-void *irq_routines[16] = { 0 };
+void *irq_vector[16] = { 0 };
 
 //设置触发某个中断后调用的函数
 void irq_set_handle(int32 irq, void (*handle)(struct regs *r))
 {
-    irq_routines[irq] = handle;
+    irq_vector[irq] = handle;
 }
 
 //重置触发中断所调用的函数
 void irq_reset_handle(int32 irq)
 {
-    irq_routines[irq] = 0;
+    irq_vector[irq] = NULL;
 }
 
 //可编程中断控制器默认会使用0-15号中断。
@@ -112,16 +114,17 @@ void irq_reset_handle(int32 irq)
 //设置成32-47号中断
 void irq_remap(void)
 {
-    outb(0x20, 0x11);
-    outb(0xA0, 0x11);
-    outb(0x21, 0x20);
-    outb(0xA1, 0x28);
-    outb(0x21, 0x04);
-    outb(0xA1, 0x02);
-    outb(0x21, 0x01);
-    outb(0xA1, 0x01);
-    outb(0x21, 0x0);
-    outb(0xA1, 0x0);
+    outb(0x20, 0x11);   //主芯片，ICW1，边沿触发，多片级联，必须有ICW4
+    outb(0xA0, 0x11);   //从芯片，ICW1，同上
+    outb(0x21, 0x20);   //主芯片，ICW2，设置起始终端号 0x20=0x27
+    outb(0xA1, 0x28);   //从芯片，ICW2，同上,0x28-0x2f
+    outb(0x21, 0x04);   //主芯片，ICW3，主芯片的IR2连接到从芯片INT
+    outb(0xA1, 0x02);   //从芯片，ICW3，INT连接到主芯片的IR2
+    outb(0x21, 0x01);   //主芯片，ICW4，8086模式，普通EOI，非缓冲，需要发送指令复位。
+    outb(0xA1, 0x01);   //从芯片，ICW4，同上
+    
+    outb(0x21, 0x0);   //打开所有中断请求
+    outb(0xA1, 0x0);   //同上
 }
 
 //初始化IRQ
@@ -196,25 +199,29 @@ void irq_handler(struct regs *r)
     //如果是cpu中断
     if (r->int_no < 32)
     {
-        //puts(exception_messages[r->int_no]);
-        //puts("Exception. System Halted!\n");
+        puts(exception_messages[r->int_no]);
+        puts("\nException. System Halted!\n");
         while(1);
     }
-        //系统前8个中断
-    else if (r->int_no >= 32 && r->int_no < 40)
+    else if (r->int_no >= 32 && r->int_no <= 47)//系统前8个中断
     {
-        handler = irq_routines[r->int_no - 32];
+        handler = irq_vector[r->int_no - 32];
         if (handler)
         {
             handler(r);
         }
     }
-        //后八个中断由另一个控制器控制，通知slave中断控制器
-    else if (r->int_no >= 40 && r->int_no <= 47)
+    else
+    {
+        puts("Unknow irq\n");
+    }
+    
+    if (r->int_no >= 40 && r->int_no <= 47)//后八个中断还需要额外通知从片EOI
     {
         outb(0xA0, 0x20);
     }
 
-    //告诉控制器，中断函数已经结束
+    //通知主片EOI
     outb(0x20, 0x20);
+    sti();
 }

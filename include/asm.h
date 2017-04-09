@@ -12,4 +12,6 @@
  void sti();
  void cli();
 
+ extern void test_int();
+ 
  #endif

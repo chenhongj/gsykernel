@@ -1,4 +1,5 @@
 #include <idt.h>
+#include <string.h>
 
 //加载IDT，位于head.s
 extern void idt_load();
@@ -24,7 +25,7 @@ void idt_init()
     idtp.limit = (sizeof (struct idt_entry) * 256) - 1;
     idtp.base = (uint32)((void *)(&idt));
     //清空
-    //memset((uint8 *)&idt, 0, sizeof(struct idt_entry) * 256);
+    memset((uint8 *)&idt, 0, sizeof(struct idt_entry) * 256);
 
     //装载IDT
     idt_load();

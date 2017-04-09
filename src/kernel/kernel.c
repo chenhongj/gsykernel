@@ -1,14 +1,15 @@
 #include <arch.h>
 #include <klog.h>
 #include <kevent.h>
+#include <video.h>
+#include <stdio.h>
+#include <asm.h>
 
+char a[10] = "qwer";
 void kernel_init()
 {
     arch_init();
 
-//    kernel_log_init();
-
-//    kernel_event_init();
-
+    puts("all done\n");
     while(1);
 }

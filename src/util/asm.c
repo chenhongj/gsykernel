@@ -38,4 +38,3 @@ inline void hlt()
 {
     __asm__ __volatile__ ("hlt");
 }
-

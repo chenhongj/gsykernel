@@ -30,4 +30,5 @@ struct idt_ptr
 //idt.c
 void idt_set_gate(uint8 num, uint32 base, uint16 sel, uint8 flags);
 void idt_init();
+
 #endif

@@ -6,6 +6,8 @@ SECTIONS
   {
     code = .;
     *(.text)
+    *(.rodata)
+    *(.rodata.str1.1)
     . = ALIGN(4096);
   }
   .data : AT(phys + (data - code))

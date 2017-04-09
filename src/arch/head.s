@@ -4,7 +4,6 @@ section .text
 extern kernel_init
 global _start
 _start:
-    cli     ;关闭中断
     ;初始化堆栈寄存器
     ;注意，此时堆栈段使用的起始地址为0，偏移为_sys_stack，在reload GDT之后，需要保证堆栈段不变，因为中间有函数调用
     mov eax, _sys_stack
@@ -144,7 +143,7 @@ irq7:
     push byte 7
     jmp irq_common_stub
 
-;  8:  	双重错误异常
+;  8:  	双重错误异常      此处CPU自动产生错误码，所以不需要手动再压入
 irq8:
     cli
     push byte 8
@@ -415,6 +414,12 @@ irq_common_stub:
     popa
     add esp, 8
     iret
+
+global test_int
+test_int:
+    int 35
+    int 45
+    ret
 
 ;给系统堆栈预留8KB内存
 SECTION .bss

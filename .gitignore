@@ -1,0 +1,6 @@
+bin/*
+obj/*
+mbrcp
+kernelcp
+*.ini
+*.img
